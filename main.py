@@ -1,4 +1,4 @@
-#import json
+import json
 import os
 from dotenv import load_dotenv
 load_dotenv()
@@ -18,19 +18,19 @@ create_tables(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-#with open('fixtures/tests_data.json', 'r') as fd:
-#    data = json.load(fd)
+with open('fixtures/tests_data.json', 'r') as f:
+    data = json.load(f)
 
-#for record in data:
-#    model = {
-#        "publisher": Publisher,
-#        "shop": Shop,
-#        "book": Book,
-#        "stock'": Stock,
-#        "sale": Sale,
-#    }[record.get('model')]
-#    session.add(model(id=record.get('pk'), **record.get('fields')))
-#session.commit()
+for record in data:
+    model = {
+        'publisher': Publisher,
+        'shop': Shop,
+        'book': Book,
+        'stock': Stock,
+        'sale': Sale,
+    }[record.get('model')]
+    session.add(model(id=record.get('pk'), **record.get('fields')))
+session.commit()
 
 publisher_1 = Publisher(name="Пушкин Александр Сергеевич")
 session.add(publisher_1)
@@ -51,23 +51,24 @@ session.commit()
 sale_1 = Sale(price=600, date_sale="09-11-2022", id_stock=1, count=3)
 session.add(sale_1)
 session.commit()
-input_ = input("Введите имя автора: ")
-def session_manager():
 
-    #input_ = input("Введите имя автора: ")
-
-    with session_manager() as session:
-        query = session.query(Publisher, Book, Shop, Stock, Sale)
-        query = query.join(Publisher, Publisher.id == Book.id_publisher)
-        query = query.join(Book, Book.id_publisher == Publisher.id)
-        query = query.join(Shop, Shop.id == Stock.id_shop)
-        query = query.join(Stock, Stock.id_book == Book.id)
-        query = query.join(Sale, Sale.id_stock == Stock.id)
-        records = query.all()
-    for title, name, price, date_sale in records.filter(Publisher.name.like(f"%{input_}%")):
-        print(f"{title} | {name} | {price} | {date_sale}")
-
+def get_shops(session, input_publisher):
+    query = session.query(
+        Book.title, Shop.name, Sale.price, Sale.date_sale
+    ).select_from(Shop).\
+        join(Stock).\
+        join(Book).\
+        join(Publisher).\
+        join(Sale)
+    if input_publisher.isdigit():
+        result = query.filter(Publisher.id == input_publisher).all()
+    else:
+        result = query.filter(Publisher.name == input_publisher).all()
+    for title, name, price, date_sale in result:
+        print(f"{title: <40} | {name: <10} | {price: <8} | {date_sale.strftime('%d-%m-%Y')}")
 session.commit()
 
-
-session.close()
+if __name__ == '__main__':
+    input_publisher = input("Введите имя или id публициста: ")
+    get_shops(session, input_publisher)
+    session.close()
