@@ -32,25 +32,26 @@ for record in data:
     session.add(model(id=record.get('pk'), **record.get('fields')))
 session.commit()
 
-publisher_1 = Publisher(name="Пушкин Александр Сергеевич")
-session.add(publisher_1)
-session.commit()
 
-book_1 = Book(title="Капитанская дочка", id_publisher=1)
-session.add(book_1)
-session.commit()
+#publisher_1 = Publisher(name="Пушкин Александр Сергеевич")
+#session.add(publisher_1)
+#session.commit()
 
-shop_1 = Shop(name="Буквоед")
-session.add(shop_1)
-session.commit()
+#book_1 = Book(title="Капитанская дочка", id_publisher=1)
+#session.add(book_1)
+#session.commit()
 
-stock_1 = Stock(id_book=1, id_shop=1, count=2)
-session.add(stock_1)
-session.commit()
+#shop_1 = Shop(name="Буквоед")
+#session.add(shop_1)
+#session.commit()
 
-sale_1 = Sale(price=600, date_sale="09-11-2022", id_stock=1, count=3)
-session.add(sale_1)
-session.commit()
+#stock_1 = Stock(id_book=1, id_shop=1, count=2)
+#session.add(stock_1)
+#session.commit()
+
+#sale_1 = Sale(price=600, date_sale="09-11-2022", id_stock=1, count=3)
+#session.add(sale_1)
+#session.commit()
 
 def get_shops(session, input_publisher):
     query = session.query(
